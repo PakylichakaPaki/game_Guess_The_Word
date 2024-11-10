@@ -1,13 +1,13 @@
 import random
+import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from aiogram.utils import executor
 
 # Токен вашего бота
 API_TOKEN = '7955201672:AAFQK31GYD4cLahmk91iSD_0htMzCepEIA0'
 
 # Список слов для угадывания
-WORDS = ['hello', 'world', 'python', 'aiogram', 'bot', 'game', 'hangman', 'word', 'guess', 'play']
+WORDS = ['hello', 'world', 'python', 'aiogram', 'bot', 'game', 'hangman', 'word', 'guess', 'play', 'fun']
 
 # Инициализация бота и диспетчера
 bot = Bot(token=API_TOKEN)
@@ -75,5 +75,10 @@ async def guess_letter(message: types.Message):
     word_state = ''.join([letter if letter in games[chat_id]['guessed_letters'] else '_' for letter in games[chat_id]['word']])
     await message.answer(f"Слово: {word_state}")
 
+async def main():
+    await dp.start_polling()
+
 if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True)
+    loop = asyncio.get_event_loop()
+    loop.create_task(main())
+    loop.run_forever()
