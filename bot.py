@@ -4,10 +4,9 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.utils import executor
 
 # Токен вашего бота
-API_TOKEN = 'YOUR_BOT_TOKEN'
+API_TOKEN = '7955201672:AAFQK31GYD4cLahmk91iSD_0htMzCepEIA0'
 
 # Список слов для угадывания
-# напиши различные слова для угадывания
 WORDS = ['hello', 'world', 'python', 'aiogram', 'bot', 'game', 'hangman', 'word', 'guess', 'play']
 
 # Инициализация бота и диспетчера
@@ -33,7 +32,7 @@ async def start_game(message: types.Message):
         'attempts': 6,
     }
     # Отправляем сообщение с приглашением начать игру
-    await message.answer(f"Я загадал слово из 5 букв. У вас есть {games[message.chat.id]['attempts']} попыток, чтобы угадать его. Введите букву:", reply_markup=keyboard)
+    await message.answer(f"Я загадал слово из {len(word)} букв. У вас есть {games[message.chat.id]['attempts']} попыток, чтобы угадать его. Введите букву:", reply_markup=keyboard)
 
 @dp.message_handler()
 async def guess_letter(message: types.Message):
