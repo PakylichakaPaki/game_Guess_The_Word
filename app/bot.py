@@ -1,12 +1,11 @@
 import random
 import asyncio
+import requests
+from flask import Flask, request
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters.command import Command
 
-# Токен вашего бота
 API_TOKEN = "7955201672:AAFQK31GYD4cLahmk91iSD_0htMzCepEIA0"
-
-# Список слов для угадывания на русском 100 слов
 
 WORDS = [
     "привет", "море", "яблоко", "собака", "кот", "дом", "машина", "книга", "город",
@@ -19,20 +18,15 @@ WORDS = [
     "вокзал", "автобус", "поезд", "самолет", "машина", "велосипед", "мотоцикл", "лодка", "корабль", "яхта",
     "спорт", "футбол", "хоккей", "баскетбол", "теннис", "плавание", "бег", "йога", "пилатес", "бодибилдинг",
     "здоровье", "питание", "тренировка", "отдых", "сон"
-    ]
+]
 
-# Инициализация бота и диспетчера
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 
-# Словарь для хранения состояния игры
 games = {}
-
-#Ввод на реагирование клавиатуры
 
 @dp.message(Command("start"))
 async def start_game(message: types.Message):
-    # Выбираем случайное слово
     word = random.choice(WORDS)
     if len(word) > 10:
         valueword = 10
@@ -40,17 +34,14 @@ async def start_game(message: types.Message):
         valueword = 7
     else:
         valueword = 5
-    # Создаем состояние игры
     games[message.chat.id] = {
         "word": word,
         "guessed_letters": set(),
         "attempts": valueword,
     }
-    # Отправляем сообщение с приглашением начать игру
     await message.answer(
         f"Я загадал слово из {len(word)} букв. У вас есть {games[message.chat.id]['attempts']} попыток, чтобы угадать его. Введите букву:",
     )
-
 
 @dp.message()
 async def guess_letter(message: types.Message):
@@ -102,8 +93,24 @@ async def guess_letter(message: types.Message):
     # Отправляем текущее состояние слова
     await message.answer(f"Слово: {word_state}")
 
-async def main():
-    await dp.start_polling(bot)
-    
+# Инициализация Flask
+app = Flask(__name__)
+
+@app.route("/setwebhook/")
+def setwebhook():
+    TELEGRAM_URL = f'https://api.telegram.org/bot{API_TOKEN}'
+    WEBHOOK_URL = 'https://Pakistan1703.pythonanywhere.com'
+    s = requests.get(f"{TELEGRAM_URL}/setWebhook?url={WEBHOOK_URL}")
+    if s.status_code == 200:
+        return "Success"
+    else:
+        return "Fail"
+
+@app.route("/webhook", methods=["POST"])
+async def webhook():
+    update = types.Update(**request.json)
+    await dp.feed_update(bot, update)
+    return "ok"
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    app.run()
